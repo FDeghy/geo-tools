@@ -2,6 +2,11 @@ name: Build geo-tools binaries
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 0"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -14,7 +19,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "stable"
           cache: false
 
       - name: Checkout domain-list-community repository
@@ -71,3 +76,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILES: ./geosite/geosite.tar.gz ./geoip/geoip.tar.gz ./mmdbverify/mmdbverify.tar.gz
+
+      - name: Clean older releases
+        uses: dev-drprasad/delete-older-releases@v0.3.4
+        with:
+          keep_latest: 4
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
